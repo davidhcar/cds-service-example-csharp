@@ -22,6 +22,7 @@ namespace org.cdshooks.example.Models
                 };
 
                 service.Prefetch.Add("patient", "Patient/{{Patient.id}}");
+                service.Prefetch.Add("condition", "Condition?patient={{context.patientId}}");
                 return service;
             }
         }

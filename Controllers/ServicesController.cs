@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using Microsoft.AspNet.Cors;
-using Microsoft.AspNet.Mvc;
+using System.ComponentModel.Design;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using org.cdshooks.example.Models;
 
 namespace org.cdshooks.example.Controllers
@@ -8,6 +10,12 @@ namespace org.cdshooks.example.Controllers
     [EnableCors("WithCredentialsAnyOrigin")]
     public class ServicesController : Controller
     {
+        ILogger _logger;
+        public ServicesController(ILogger<ServicesController> logger)
+        {
+            this._logger = logger;
+            _logger.LogInformation("Log Initialized!");
+        }
 
         [HttpGet("/cds-services")]
         public ActionResult Discovery()
@@ -21,8 +29,11 @@ namespace org.cdshooks.example.Controllers
         }
 
         [HttpPost("/cds-services/static")]
-        public ActionResult Static([FromBody]string value)
+        public async Task<ActionResult> Static(HttpRequest req)
         {
+            var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            _logger.LogInformation($"Request Body: {requestBody}");
+
             var cards = new Dictionary<string, IList<Card>>
             {
                 { "cards", CardRepository.Get() }
